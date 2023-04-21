@@ -107,6 +107,9 @@ const firestore = admin.firestore();
       eadhDoc.delete()
     })
 
+    await firestore.collection('chats').doc(id).delete()
+
+
     // Delete the user from the "weLikeEachOther" subcollections in both places, in mine, and in the other person's subcollection
 
     const path1 = `users/${myId}/weLikeEachOther/${idOfPersonThatIDontLike}`
