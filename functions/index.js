@@ -26,7 +26,7 @@ const firestore = admin.firestore();
    const body = request.body
 
    const type = body.type
-   
+   console.log('body', body)
 
   if( type === 'personLikesMe'){
     const myId = body.myId
@@ -87,6 +87,36 @@ const firestore = admin.firestore();
 
 
     response.send("We like Each other successfully done");
+  }
+
+  if( type === 'breakMatch'){
+
+    console.log('break match')
+    // Get the data passed through the API CALL
+    
+    const myId = body.myId
+    const idOfPersonThatIDontLike = body.idOfPersonThatIDontLike
+    console.log('my id', myId)
+    console.log('personIdonTLike', idOfPersonThatIDontLike)
+    // Delete all the Chat
+    const id = generateChatId(myId, idOfPersonThatIDontLike)
+    console.log('id', id)
+    const listMessageDocuments = await firestore.collection('chats').doc(id).collection('messages').listDocuments()
+    console.log('list of message doc', listMessageDocuments)
+    listMessageDocuments.forEach((eadhDoc)=>{
+      eadhDoc.delete()
+    })
+
+    // Delete the user from the "weLikeEachOther" subcollections in both places, in mine, and in the other person's subcollection
+
+    const path1 = `users/${myId}/weLikeEachOther/${idOfPersonThatIDontLike}`
+    const path2 = `users/${idOfPersonThatIDontLike}/weLikeEachOther/${myId}`
+
+    // Perform the delete operations
+    await firestore.doc(path1).delete()
+    await firestore.doc(path2).delete()
+
+    response.send('Deletion successfull')
   }
 
 
